@@ -1,0 +1,148 @@
+// =================================
+//   SETTINGS
+// =================================
+
+// Image Path
+// =================================
+// Set the basepath to your images dir.
+// Absolute paths are okay too!
+@base_url: "./images/";
+
+
+//  Resolution Break-points
+// =================================
+// Update as you see fit for your project
+
+// Standard Resolution (anything up to 165dpi)
+@mq_resolution_1x: ~"(max-resolution: 165dpi), (-webkit-max-device-pixel-ratio: 1.0)";
+
+// 2x Resolution (up to 335dpi)
+@mq_resolution_2x: ~"(max-resolution: 335dpi), (-webkit-max-device-pixel-ratio: 2)";
+
+// 3x Resolution (should probably go up to 495dpi)
+@mq_resolution_3x: ~"(min-resolution: 336dpi), (-webkit-min-device-pixel-ratio: 2.01)";
+
+//  Mimetypes
+// =================================
+// Not presently used.
+// Will be needed for LESS 1.4
+// Update as needed for your image files.
+.mimetype(png){@mimetype:"image/png";}
+.mimetype(jpg){@mimetype:"image/jpeg";}
+.mimetype(jpeg){@mimetype:"image/jpeg";}
+.mimetype(gif){@mimetype:"image/gif";}
+
+// =================================
+//   STOP EDITING
+// =================================
+
+
+//  Filename Resolution Identifiers
+// =================================
+// The part of the filename that
+// indicates it's resolution.
+.res_string(@default){ @res_string:"";}
+.res_string(2){ @res_string: "@2x";}
+.res_string(3){ @res_string: "@3x";}
+
+
+
+//  CSS Value Constructors (x3)
+// =================================
+// A helper mixin used by the
+// background-image mixin for
+// creating the filename from
+// the parameters provided.
+.construct_image(@basename, @ext, @resolution:1){
+
+	// Returns @dui_data string or number zero
+	// when there is no defined data-uri image.
+	.get_dui_data(@basename, @resolution);
+
+	// Converts numeric resolution factor to
+	// a string that can be used in the filename.
+	.res_string(@resolution);
+
+	// If no data-uri image was found, construct uri path
+	.construct_file_img_value(@basename, @ext, @res_string);
+
+	// If there is a data-uri defined at the proper resolution
+	.construct_datauri_img_value(@dui_data, @resolution);
+
+}
+
+// =================================
+// A helper mixin used by the
+// .construct_image mixin. When there
+// is no data uri image found, it
+// constructs the entire value for the
+// CSS background-image property,
+// including the url() wrapper.
+.construct_file_img_value(@basename, @ext, @res_string) when not (isstring(@dui_data)){
+
+	// URL-escape the base name.
+	@e_basename: escape(@basename);
+
+	// This is basically the "return" value. This variable becomes
+	// available in the scope of the parent that called this mixin.
+	@constructed_img: ~"url('@{base_url}@{e_basename}@{res_string}.@{ext}')";
+
+	// LESS 1.4.0 method
+	// .mimetype(@ext);
+	// @full_url: "@{base_url}@{e_basename}@{res_string}.@{ext}";
+	// @constructed_img: data-uri(@full_url);
+
+}
+
+// =================================
+// A helper mixin used by the
+// .construct_image mixin. When a
+// data uri image is found, it
+// constructs the entire value for the
+// CSS background-image property,
+// including the url() wrapper.
+.construct_datauri_img_value(@data, @res) when (isstring(@dui_data)){
+
+	// Assumes that the data for this image already contains
+	// mimetype, etc. and only needs to be wrapped in the url.
+	@constructed_img: ~"url('@{data}')";
+
+}
+
+// =================================
+//  Mixins as Property Aliases
+// =================================
+// Notice PNG is the default filetype.
+// Set it to what works for you.
+
+// Only one mixin at this time. But you
+// can easily duplicate it for other
+// properties, such as .border-image, or
+// .list-style-image.
+.background-image(@basename, @ext:png){
+
+	@media @mq_resolution_1x{
+
+		// Standard Resolution (anything up to 165dpi)
+		.construct_image(@basename, @ext, 1);
+		background-image:@constructed_img;
+
+		// LESS 1.4.0 will support data-uri automatically, like so...
+		// background-image:data-uri(@mimetype, @constructed_img);
+	}
+
+	@media @mq_resolution_2x {
+
+		// 2x Resolution
+		.construct_image(@basename, @ext, 2);
+		background-image: @constructed_img;
+
+	}
+	@media @mq_resolution_3x {
+
+		// 3x Resolution
+		.construct_image(@basename, @ext, 3);
+		background-image: @constructed_img;
+
+	}
+}

@@ -1,0 +1,46 @@
+// This is your main less file for whatever project you are working on.
+@import url(../auto-multi-resolution-images.less);
+@import url(data-uri-images.less);
+
+body{
+	font-family:sans-serif;
+	font-size: 36px;
+	color:black;
+	line-height: 40px;
+}
+div{
+	margin:20px 0;
+	border-left:4px solid red;
+	border-right:4px solid red;
+}
+.example1{
+	// The mixin name matches the CSS property.
+	// Specify the basename and the file type.
+	.background-image('arrow-right', gif);
+	height:150px;
+	width:100%;
+	background-repeat: no-repeat;
+	background-size: auto 100%;
+	background-position: right top;
+}
+.example2{
+	// PNG is the default filetype,
+	// so no need to specify.
+	.background-image('texture-pattern');
+	height: 150px;
+	width:100%;
+	background-repeat: repeat;
+}
+.example3{
+	// Since there is no data-uri for this
+	// image, it will output the url to the
+	// file based on the @base_url variable,
+	// which is set at the top of the
+	// auto-multi-resolution-images.less file.
+	.background-image('pleeease',jpg);
+	height: 200px;
+	width: 100%;
+	background-size:auto 100%;
+	background-position: right top;
+	background-repeat: no-repeat;
+}
